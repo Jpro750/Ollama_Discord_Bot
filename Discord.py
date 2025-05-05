@@ -1,58 +1,28 @@
-import discord
-from discord.ext import commands
-from functions import generate_answer
-import asyncio 
+from discord.ext.commands import Bot
+from ollama import AsyncClient
 
-intents = discord.Intents.default()
-intents.message_content = True
+class MyBot(Bot):
+    def __init__(self) -> None:
+        super().__init__(...)
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+    async def ollama_chat(self, prompt: str) -> str:
+        client = AsyncClient()
 
-@bot.event
-async def on_ready():
-    print(f'We have logged in as {bot.user}')
+        payload = {'role': 'user', 'content': prompt}
+
+        response = await client.chat(
+            model = 'gemma3:1b',
+            messages = [payload]
+        )
+
+        return response.message.content or "No response given."
+
+bot = MyBot()
 
 @bot.command()
-async def gemma(ctx):
-    if ctx.author == bot.user:
-        return
-    async with ctx.typing(): 
-        text = ctx.message.content[7:]
-        if len(text) > 0:
-            
-            loop = asyncio.get_running_loop()
-            answer =  await loop.run_in_executor(None, generate_answer, text)
-            
-            if len(answer) > 2000:
-                inital = 2000
-                legth = len(answer)
-                
-                await ctx.send(answer[:2000])
-                while True:
-                    send_message = answer[inital:inital+2000]
-                    await ctx.send(send_message)
-                    inital += 2000
-                    # si lo que falta  es menor a 2000 , envimaos el mensaje desde intial hasta el final
-                    if legth - inital < 2000:
-                        break
-                is_missing = answer[inital:]
-                if  len(is_missing) > 0:
-                    await ctx.send(is_missing)
+async def prompt(ctx, text: str):
+    reply = await bot.ollama_chat(text)
 
-            else:
-                await ctx.send(answer)
-        else:
-            await ctx.send("Porfavor escriba un mensaje.")
-                
-            
- 
- 
-            
-            
-                
+    await ctx.reply(reply)
 
-    
-
-
-
-bot.run("")
+bot.run('')
