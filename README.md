@@ -28,7 +28,7 @@ Bot de Discord que utiliza Ollama para integrar un modelo de lenguaje grande (LL
 ## Configuración
 
 1. **Especificar el modelo**
-   - Abre `functions.py` y modifica la línea:
+   - Abre `Discord.py` y modifica la línea:
      ```python
      model = "<nombre-del-modelo>"
      ```
