@@ -1,9 +1,12 @@
 from discord.ext.commands import Bot
 from ollama import AsyncClient
+from discord import Intents
 
 class MyBot(Bot):
     def __init__(self) -> None:
-        super().__init__(...)
+        intents = Intents.default()
+        intents.message_content = True  
+        super().__init__(command_prefix="!", intents=intents)
 
     async def ollama_chat(self, prompt: str) -> str:
         client = AsyncClient()
